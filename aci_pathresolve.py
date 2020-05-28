@@ -44,7 +44,7 @@ def DeploymentQuery(session, mydict, epg):
     for i in testquery.children:
         for j in i.children:
             print(j.dn)
-            tenant_name, epg_name, node_name, port_list = extractinfo(str(j.dn), port_list)
+            # tenant_name, epg_name, node_name, port_list = extractinfo(str(j.dn), port_list)
 
     try:
         node_name
