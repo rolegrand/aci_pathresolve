@@ -11,6 +11,7 @@ import cobra.modelimpl.fv.extstpathatt
 import requests
 import time
 import argparse
+import random
 # import pandas as pd
 requests.packages.urllib3.disable_warnings()
 
@@ -27,14 +28,15 @@ def read_ext_file():
         dict_building(tenant_name, epg_name, node_name, port_list)
 
 
-def dict_building(tenant_name, epg_name, node_name, port_list):
+def dict_building(tenant_name, epg_name, node_name, port_name):
     if epg_name == 'none':
         pass
     else:
-        mydict[tenant_name + '-' + epg_name] = {'tenant_name': tenant_name,
-                                                'epg_name': epg_name,
-                                                'node_name': node_name,
-                                                'port_name': port_list}
+        random_number = random.randrange(65535)
+        mydict[random_number] = {'tenant_name': tenant_name,
+                                 'epg_name': epg_name,
+                                 'node_name': node_name,
+                                 'port_name': port_name}
 
     return mydict
 
@@ -46,15 +48,14 @@ def extractinfo(input, port_list):
 
     if 'aggr-' in input:
         port_name = input.split('aggr-[', 1)[1].split(']')[0]
-        port_list.append(port_name)
+        # port_list.append(port_name)
     elif 'phys-' in input:
         port_name = input.split('phys-[', 1)[1].split(']')[0]
-        port_list.append(port_name)
     else:
         port_name = 'no_match'
-        port_list.append(port_name)
 
-    return tenant_name, epg_name, node_name, port_list
+    dict_building(tenant_name, epg_name, node_name, port_name)
+    return tenant_name, epg_name, node_name, port_name
 
 def DeploymentQuery(session, mydict, epg):
     port_list = []
@@ -66,17 +67,6 @@ def DeploymentQuery(session, mydict, epg):
     for i in testquery.children:
         for j in i.children:
             tenant_name, epg_name, node_name, port_list = extractinfo(str(j.dn), port_list)
-
-    try:
-        node_name
-        epg_name
-        tenant_name
-    except NameError:
-        node_name = 'none'
-        epg_name = 'none'
-        tenant_name = 'none'
-
-    dict_building(tenant_name, epg_name, node_name, port_list)
     return mydict
 
 def main():
